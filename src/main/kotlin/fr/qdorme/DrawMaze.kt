@@ -38,26 +38,27 @@ class DrawMaze(private val maze: Maze):Observer{
 
     fun drawMaze(g:Graphics){
         maze.cells.forEach { rows -> rows.forEach{ cell ->
-            val x1 = cell.col * CELL_SIZE
-            val x2 = (cell.col + 1) * CELL_SIZE
-            val y2 = (maze.rowsNumber - cell.row - 1 ) * CELL_SIZE
-            val y1 = (maze.rowsNumber - cell.row) * CELL_SIZE
+            if(cell.active) {
+                val x1 = cell.col * CELL_SIZE
+                val x2 = (cell.col + 1) * CELL_SIZE
+                val y2 = (maze.rowsNumber - cell.row - 1) * CELL_SIZE
+                val y1 = (maze.rowsNumber - cell.row) * CELL_SIZE
 
-            if(cell.visited){
-                g.color = Color(100, 100, 150, 50)
-                g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
+                if (cell.visited) {
+                    g.color = Color(100, 100, 150, 50)
+                    g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
+                }
+
+                g.color = Color.black
+                if (!cell.isLinkedTo("up"))
+                    g.drawLine(x1, y2, x2, y2)
+                if (!cell.isLinkedTo("right"))
+                    g.drawLine(x2, y1, x2, y2)
+                if (!cell.isLinkedTo("down"))
+                    g.drawLine(x1, y1, x2, y1)
+                if (!cell.isLinkedTo("left"))
+                    g.drawLine(x1, y1, x1, y2)
             }
-
-            g.color = Color.black
-            if (!cell.isLinkedTo("up"))
-                g.drawLine(x1, y2, x2, y2)
-            if (!cell.isLinkedTo("right"))
-                g.drawLine(x2, y1, x2, y2)
-            if (!cell.isLinkedTo("down"))
-                g.drawLine(x1, y1, x2, y1)
-            if (!cell.isLinkedTo("left"))
-                g.drawLine(x1, y1, x1, y2)
-
         }}
     }
 

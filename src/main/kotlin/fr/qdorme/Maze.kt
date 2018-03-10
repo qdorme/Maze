@@ -18,7 +18,7 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
                     rows.add(cell)
                     unvisitedCells.add(cell)
                 }else{
-                    val cell = Cell(col, row, mask.getRGB(col, row) == -1)
+                    val cell = Cell(col, row, mask.getRGB(col, rowsNumber - row -1) == -1)
                     rows.add(cell)
                     if(cell.active)
                         unvisitedCells.add(cell)
