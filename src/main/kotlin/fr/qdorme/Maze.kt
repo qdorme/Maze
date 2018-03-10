@@ -87,7 +87,11 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
             //println(" remaining cells $remainingPossibleCells")
             setChanged()
             notifyObservers()
-            Thread.sleep(10L)
+            Thread.sleep(35L)
         }
+    }
+
+    fun findEntryExit(){
+
     }
 }

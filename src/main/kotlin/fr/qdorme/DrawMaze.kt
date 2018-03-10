@@ -33,10 +33,12 @@ class DrawMaze(private val maze: Maze):Observer{
             }
         }
         frame.add(panel)
+        panel.isDoubleBuffered=true
         panel.revalidate()
     }
 
     fun drawMaze(g:Graphics){
+
         maze.cells.forEach { rows -> rows.forEach{ cell ->
             if(cell.active) {
                 val x1 = cell.col * CELL_SIZE
