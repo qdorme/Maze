@@ -29,7 +29,8 @@ fun main(args: Array<String>) {
     }
 
     val drawMaze = DrawMaze(maze)
+    //drawMaze.refresh()
+    maze.addObserver(drawMaze)
     maze.generate()
-    drawMaze.refresh()
 }
 

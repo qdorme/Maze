@@ -1,63 +1,95 @@
 package fr.qdorme
 
 import java.awt.image.BufferedImage
+import java.util.*
 
-class Maze(val cols:Int, val rows:Int, mask: BufferedImage?){
+class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observable() {
 
-    val cells = mutableListOf<Cell>()
+    val cells = mutableListOf<List<Cell>>()
     private val unvisitedCells = mutableListOf<Cell>()
 
     init{
-        for(col in 0 until cols){
-            for (row in 0 until rows){
+        for(col in 0 until colsNumber){
+            val rows = mutableListOf<Cell>()
+            cells.add(rows)
+            for (row in 0 until rowsNumber){
                 if (mask == null) {
                     val cell = Cell(col, row)
-                    cells.add(cell)
+                    rows.add(cell)
                     unvisitedCells.add(cell)
                 }else{
                     val cell = Cell(col, row, mask.getRGB(col, row) == -1)
-                    cells.add(cell)
-                    unvisitedCells.add(cell)
+                    rows.add(cell)
+                    if(cell.active)
+                        unvisitedCells.add(cell)
                 }
             }
         }
     }
 
-    fun getPossibleCellsToConnect(cell: Cell):List<Cell>{
-        val possibleCells = mutableListOf<Cell>()
-        val indexUp = cell.row-1 + cell.col*rows
-        val indexRight = cell.row + (cell.col+1)*rows
-        val indexDown = cell.row+1 + cell.col*rows
-        val indexLeft = cell.row + (cell.col-1)*rows
-
-        if(indexUp > -1 && indexUp < cells.size && !cells[indexUp].visited)
-            possibleCells.add(cells[indexUp])
-        if(indexRight > -1 && indexRight < cells.size && !cells[indexRight].visited)
-            possibleCells.add(cells[indexRight])
-        if(indexDown > -1 && indexDown < cells.size && !cells[indexDown].visited)
-            possibleCells.add(cells[indexDown])
-        if(indexLeft > -1 && indexLeft < cells.size && !cells[indexLeft].visited)
-            possibleCells.add(cells[indexLeft])
-
+    fun getPossibleCellsToGo(cell: Cell):MutableList<Cell>{
+        val possibleCells = getNeighbors(cell)
+        possibleCells.retainAll { cell -> !cell.visited }
         return possibleCells
     }
 
+    fun getPossibleCellsToConnect(cell: Cell):MutableList<Cell>{
+        val possibleCells = getNeighbors(cell)
+        possibleCells.retainAll { cell -> cell.visited }
+        return possibleCells
+    }
+
+    fun getNeighbors(cell: Cell):MutableList<Cell>{
+        val possibleCells = mutableListOf<Cell>()
+        if(cell.row - 1 >= 0 )
+            possibleCells.add(cells[cell.col][cell.row-1])
+        if(cell.row + 1 < rowsNumber )
+            possibleCells.add(cells[cell.col][cell.row+1])
+        if(cell.col - 1 >= 0 )
+            possibleCells.add(cells[cell.col-1][cell.row])
+        if(cell.col + 1 < colsNumber)
+            possibleCells.add(cells[cell.col+1][cell.row])
+        return possibleCells
+    }
+
+
+
     fun generate(){
+        val remainingPossibleCells = mutableListOf<Cell>()
         var currentCell:Cell? = unvisitedCells.shuffled()[0]
         while (unvisitedCells.size > 0){
+            //println("=======================================")
+            //println(" current cell $currentCell")
             if(currentCell == null) {
-                currentCell = cells.filter { cell -> getPossibleCellsToConnect(cell).size > 0 }.shuffled()[0]
+                //println(" select cell from remaining cells")
+                currentCell = remainingPossibleCells.shuffled()[0]
+                //println(" select cell $currentCell")
+                val closeVIsitedCells = getPossibleCellsToConnect(currentCell)
+                if(closeVIsitedCells.size > 0){
+                    val neighbor = closeVIsitedCells.shuffled()[0]
+                    currentCell.linkCell(neighbor)
+                    //println(" connect remaiing to $neighbor")
+                }
             }
             currentCell.visited=true
             unvisitedCells.remove(currentCell)
-            val possibleCellsToConnect = getPossibleCellsToConnect(currentCell)
-            if(possibleCellsToConnect.size>0){
-                var newCell = possibleCellsToConnect.shuffled()[0]
+            val possibleCellsToGo = getPossibleCellsToGo(currentCell)
+            //println(" possible cells = $possibleCellsToGo")
+            currentCell = if(possibleCellsToGo.size>0){
+                val newCell = possibleCellsToGo.shuffled()[0]
+                //println(" selected cell $newCell")
+                possibleCellsToGo.remove(newCell)
                 currentCell.linkCell(newCell)
-                currentCell = newCell
+                remainingPossibleCells.addAll(possibleCellsToGo)
+                newCell
             }else{
-                currentCell = null
+                null
             }
+            remainingPossibleCells.retainAll{ cell -> !cell.visited }
+            //println(" remaining cells $remainingPossibleCells")
+            setChanged()
+            notifyObservers()
+            Thread.sleep(10L)
         }
     }
 }

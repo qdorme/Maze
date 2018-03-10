@@ -3,28 +3,33 @@ package fr.qdorme
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.image.BufferedImage
+import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.WindowConstants
 
-val cellSize = 10
+const val CELL_SIZE = 10
 
-class DrawMaze(private val maze: Maze){
+class DrawMaze(private val maze: Maze):Observer{
 
-    private val canvas = BufferedImage(maze.cols * cellSize + 1 , maze.rows * cellSize + 1 , BufferedImage.TYPE_INT_ARGB)
+    override fun update(o: Observable?, arg: Any?) {
+        refresh()
+    }
+
+    private val image = BufferedImage(maze.colsNumber * CELL_SIZE +1 , maze.rowsNumber * CELL_SIZE +1 , BufferedImage.TYPE_INT_ARGB)
     private val frame = JFrame("Maze")
     private val panel: JPanel
 
     init {
         frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-        frame.setSize(canvas.width + 13 , canvas.height + 60)
+        frame.setSize(image.width + 38 , image.height + 60)
         frame.isVisible = true
 
         panel = object : JPanel() {
             override fun paintComponent(g: Graphics) {
                 super.paintComponent(g)
-                drawMaze(canvas.graphics)
-                g.drawImage(canvas, 0, 0, maze.cols * cellSize + 1 , maze.rows * cellSize + 1 , this)
+                drawMaze(image.graphics)
+                g.drawImage(image,10,10,null)
             }
         }
         frame.add(panel)
@@ -32,11 +37,16 @@ class DrawMaze(private val maze: Maze){
     }
 
     fun drawMaze(g:Graphics){
-        maze.cells.forEach{ cell ->
-            val x1 = cell.col * cellSize
-            val x2 = (cell.col + 1) * cellSize
-            val y2 = (maze.rows - cell.row) * cellSize
-            val y1 = (maze.rows - cell.row + 1) * cellSize
+        maze.cells.forEach { rows -> rows.forEach{ cell ->
+            val x1 = cell.col * CELL_SIZE
+            val x2 = (cell.col + 1) * CELL_SIZE
+            val y2 = (maze.rowsNumber - cell.row - 1 ) * CELL_SIZE
+            val y1 = (maze.rowsNumber - cell.row) * CELL_SIZE
+
+            if(cell.visited){
+                g.color = Color(100, 100, 150, 50)
+                g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
+            }
 
             g.color = Color.black
             if (!cell.isLinkedTo("up"))
@@ -48,12 +58,12 @@ class DrawMaze(private val maze: Maze){
             if (!cell.isLinkedTo("left"))
                 g.drawLine(x1, y1, x1, y2)
 
-        }
+        }}
     }
 
     fun refresh() {
-        canvas.graphics.color = Color.WHITE
-        canvas.graphics.fillRect(0, 0, maze.cols * cellSize + 1, maze.rows * cellSize + 1)
+        image.graphics.color = Color.WHITE
+        image.graphics.fillRect(0, 0, maze.colsNumber * CELL_SIZE + 1, maze.rowsNumber * CELL_SIZE + 1)
         panel.updateUI()
     }
 }
