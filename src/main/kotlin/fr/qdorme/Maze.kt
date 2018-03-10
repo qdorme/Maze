@@ -27,32 +27,30 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
         }
     }
 
-    fun getPossibleCellsToGo(cell: Cell):MutableList<Cell>{
+    private fun getPossibleCellsToGo(cell: Cell):MutableList<Cell>{
         val possibleCells = getNeighbors(cell)
         possibleCells.retainAll { cell -> !cell.visited }
         return possibleCells
     }
 
-    fun getPossibleCellsToConnect(cell: Cell):MutableList<Cell>{
+    private fun getPossibleCellsToConnect(cell: Cell):MutableList<Cell>{
         val possibleCells = getNeighbors(cell)
         possibleCells.retainAll { cell -> cell.visited }
         return possibleCells
     }
 
-    fun getNeighbors(cell: Cell):MutableList<Cell>{
+    private fun getNeighbors(cell: Cell):MutableList<Cell>{
         val possibleCells = mutableListOf<Cell>()
-        if(cell.row - 1 >= 0 )
+        if(cell.row - 1 >= 0 && cells[cell.col][cell.row-1].active)
             possibleCells.add(cells[cell.col][cell.row-1])
-        if(cell.row + 1 < rowsNumber )
+        if(cell.row + 1 < rowsNumber && cells[cell.col][cell.row+1].active)
             possibleCells.add(cells[cell.col][cell.row+1])
-        if(cell.col - 1 >= 0 )
+        if(cell.col - 1 >= 0 && cells[cell.col-1][cell.row].active)
             possibleCells.add(cells[cell.col-1][cell.row])
-        if(cell.col + 1 < colsNumber)
+        if(cell.col + 1 < colsNumber && cells[cell.col+1][cell.row].active)
             possibleCells.add(cells[cell.col+1][cell.row])
         return possibleCells
     }
-
-
 
     fun generate(){
         val remainingPossibleCells = mutableListOf<Cell>()
