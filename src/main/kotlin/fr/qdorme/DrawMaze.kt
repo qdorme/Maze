@@ -38,7 +38,6 @@ class DrawMaze(private val maze: Maze):Observer{
     }
 
     fun drawMaze(g:Graphics){
-
         maze.cells.forEach { rows -> rows.forEach{ cell ->
             if(cell.active) {
                 val x1 = cell.col * CELL_SIZE
@@ -50,7 +49,7 @@ class DrawMaze(private val maze: Maze):Observer{
                     g.color = Color(100, 100, 150, 50)
                     g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
                 }else if(cell.distance != 0 && !cell.entry && !maze.generated){
-                    val alpha = 255 * cell.distance / ( maze.colsNumber * maze.rowsNumber)
+                    val alpha = 255 * cell.distance / maze.activeCellsNumber
                     g.color = Color(250, 0, 0, alpha)
                     g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
                 }else if(cell.entry){
@@ -59,6 +58,7 @@ class DrawMaze(private val maze: Maze):Observer{
                 }
 
                 g.color = Color.black
+
                 if (!cell.isLinkedTo("up"))
                     g.drawLine(x1, y2, x2, y2)
                 if (!cell.isLinkedTo("right"))
@@ -71,7 +71,7 @@ class DrawMaze(private val maze: Maze):Observer{
         }}
     }
 
-    fun refresh() {
+    private fun refresh() {
         image.graphics.color = Color.WHITE
         image.graphics.fillRect(0, 0, maze.colsNumber * CELL_SIZE + 1, maze.rowsNumber * CELL_SIZE + 1)
         panel.updateUI()
