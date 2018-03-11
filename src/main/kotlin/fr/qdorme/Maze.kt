@@ -16,9 +16,11 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
             cells.add(rows)
             for (row in 0 until rowsNumber){
                 if (mask == null) {
-                    val cell = Cell(col, row)
+                    val active = col != 0 && row != 0 && col != colsNumber-1 && row != rowsNumber-1
+                    val cell = Cell(col, row, active)
                     rows.add(cell)
-                    unvisitedCells.add(cell)
+                    if(cell.active)
+                        unvisitedCells.add(cell)
                 }else{
                     val cell = Cell(col, row, mask.getRGB(col, rowsNumber - row -1) == -1)
                     rows.add(cell)
@@ -58,8 +60,8 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
         return possibleCells
     }
 
-    private fun getInactivesNeighbors(cell: Cell):MutableList<Cell>{
-        val possibleCells = mutableListOf<Cell>()
+    private fun getInactivesNeighbors(cell: Cell):MutableList<Cell?>{
+        val possibleCells = mutableListOf<Cell?>()
         if(cell.row - 1 >= 0 && !cells[cell.col][cell.row-1].active)
             possibleCells.add(cells[cell.col][cell.row-1])
         if(cell.row + 1 < rowsNumber && !cells[cell.col][cell.row+1].active)
@@ -130,7 +132,7 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
         notifyObservers()
     }
 
-    fun propagateDistance(cell:Cell,distance:Int){
+    private fun propagateDistance(cell:Cell, distance:Int){
         cell.distance = distance
         setChanged()
         notifyObservers()

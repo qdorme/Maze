@@ -18,8 +18,8 @@ fun main(args: Array<String>) {
             maze = Maze(cols, rows, mask)
         }
         2 -> {
-            cols = args[0].toInt()
-            rows = args[1].toInt()
+            cols = args[0].toInt() + 2
+            rows = args[1].toInt() + 2
             maze = Maze(cols, rows,null)
         }
         else -> {

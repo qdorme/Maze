@@ -18,10 +18,10 @@ class Cell(val col : Int, val row:Int, val active:Boolean=true){
 
     fun isLinkedTo(to:String):Boolean{
         return when(to){
-            "down" -> linkedCells.any{ cell -> cell.row == row - 1} || row-1 == exit?.row?:-1
-            "right" -> linkedCells.any{ cell -> cell.col == col + 1} || col+1 == exit?.col?:-1
-            "left" -> linkedCells.any{ cell -> cell.col == col - 1} || col-1 == exit?.col?:-1
-            "up" -> linkedCells.any{ cell -> cell.row == row + 1} || row+1 == exit?.row?:-1
+            "down" -> linkedCells.any{ cell -> cell.row == row - 1} || row-1 == exit?.row?:-2
+            "right" -> linkedCells.any{ cell -> cell.col == col + 1} || col+1 == exit?.col?:-2
+            "left" -> linkedCells.any{ cell -> cell.col == col - 1} || col-1 == exit?.col?:-2
+            "up" -> linkedCells.any{ cell -> cell.row == row + 1} || row+1 == exit?.row?:-2
             else -> false
         }
     }
