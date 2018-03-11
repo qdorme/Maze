@@ -3,10 +3,10 @@ package fr.qdorme
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.image.BufferedImage
+import java.io.File
 import java.util.*
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.WindowConstants
+import javax.imageio.ImageIO
+import javax.swing.*
 
 const val CELL_SIZE = 10
 
@@ -22,8 +22,17 @@ class DrawMaze(private val maze: Maze):Observer{
 
     init {
         frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-        frame.setSize(image.width + 38 , image.height + 60)
+        frame.setSize(image.width + 38 , image.height + 80)
         frame.isVisible = true
+
+        val menuBar = JMenuBar()
+        frame.jMenuBar = menuBar
+        val menuItem = JMenuItem("Save")
+        menuBar.add(menuItem)
+
+        menuItem.addActionListener({ e ->
+            ImageIO.write(image, "png", File("/temp/maze.png"))
+        })
 
         panel = object : JPanel() {
             override fun paintComponent(g: Graphics) {
