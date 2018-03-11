@@ -46,8 +46,15 @@ class DrawMaze(private val maze: Maze):Observer{
                 val y2 = (maze.rowsNumber - cell.row - 1) * CELL_SIZE
                 val y1 = (maze.rowsNumber - cell.row) * CELL_SIZE
 
-                if (cell.visited) {
+                if (cell.visited && cell.distance == 0 && !cell.entry && !maze.generated) {
                     g.color = Color(100, 100, 150, 50)
+                    g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
+                }else if(cell.distance != 0 && !cell.entry && !maze.generated){
+                    val alpha = 255 * cell.distance / ( maze.colsNumber * maze.rowsNumber)
+                    g.color = Color(250, 0, 0, alpha)
+                    g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
+                }else if(cell.entry){
+                    g.color = Color(0, 200, 0, 100)
                     g.fillRect(x1, y2, CELL_SIZE, CELL_SIZE)
                 }
 

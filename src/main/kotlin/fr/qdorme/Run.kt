@@ -32,5 +32,6 @@ fun main(args: Array<String>) {
     //drawMaze.refresh()
     maze.addObserver(drawMaze)
     maze.generate()
+    maze.findEntries()
 }
 

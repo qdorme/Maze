@@ -2,8 +2,11 @@ package fr.qdorme
 
 class Cell(val col : Int, val row:Int, val active:Boolean=true){
     var visited = false
+    var distance = 0
+    var bordered = false
+    var entry = false
 
-    private val linkedCells = mutableListOf<Cell>()
+    val linkedCells = mutableListOf<Cell>()
 
     fun linkCell(cell: Cell){
         if (!linkedCells.contains(cell)){

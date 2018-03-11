@@ -7,6 +7,7 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
 
     val cells = mutableListOf<List<Cell>>()
     private val unvisitedCells = mutableListOf<Cell>()
+    var generated = false
 
     init{
         for(col in 0 until colsNumber){
@@ -49,6 +50,9 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
             possibleCells.add(cells[cell.col-1][cell.row])
         if(cell.col + 1 < colsNumber && cells[cell.col+1][cell.row].active)
             possibleCells.add(cells[cell.col+1][cell.row])
+
+        if(possibleCells.size < 4)
+            cell.bordered = true
         return possibleCells
     }
 
@@ -62,9 +66,9 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
                 //println(" select cell from remaining cells")
                 currentCell = remainingPossibleCells.shuffled()[0]
                 //println(" select cell $currentCell")
-                val closeVIsitedCells = getPossibleCellsToConnect(currentCell)
-                if(closeVIsitedCells.size > 0){
-                    val neighbor = closeVIsitedCells.shuffled()[0]
+                val closeVisitedCells = getPossibleCellsToConnect(currentCell)
+                if(closeVisitedCells.size > 0){
+                    val neighbor = closeVisitedCells.shuffled()[0]
                     currentCell.linkCell(neighbor)
                     //println(" connect remaiing to $neighbor")
                 }
@@ -91,7 +95,35 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
         }
     }
 
-    fun findEntryExit(){
+    fun findEntries(){
+        var arbitraryCell = cells.filter { cols -> cols.any { cell -> cell.active } }[0].filter{cell -> cell.active}[0]
+        propagateDistance(arbitraryCell,1)
+        val firstEntry = cells
+                .map { cols -> cols.filter{cell -> cell.bordered }.maxBy { it.distance  } }
+                .maxBy { it!!.distance }!!
+        firstEntry?.entry=true
 
+        cells.forEach { cols->cols.forEach { if (it.active) it.distance = 0 } }
+        propagateDistance(firstEntry,1)
+        val secondEntry = cells
+                .map { cols -> cols.filter{cell -> cell.bordered }.maxBy { it.distance  } }
+                .maxBy { it!!.distance }!!
+        secondEntry?.entry=true
+
+        generated = true
+
+        setChanged()
+        notifyObservers()
+    }
+
+    fun propagateDistance(cell:Cell,distance:Int){
+        cell.distance = distance
+        setChanged()
+        notifyObservers()
+        Thread.sleep(35L)
+        cell.linkedCells.forEach { cell ->
+            if(cell.distance == 0)
+                propagateDistance(cell,distance +1)
+        }
     }
 }
