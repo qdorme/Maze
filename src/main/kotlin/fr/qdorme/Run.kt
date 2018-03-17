@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
+const val sleep = 25L
+
 fun main(args: Array<String>) {
 
     var mask: BufferedImage?
@@ -15,12 +17,12 @@ fun main(args: Array<String>) {
             mask = ImageIO.read(File(args[0]))
             cols = mask.data.width
             rows = mask.data.height
-            maze = Maze(cols, rows, mask)
+            maze = Maze(cols, rows, mask, sleep)
         }
         2 -> {
             cols = args[0].toInt() + 2
             rows = args[1].toInt() + 2
-            maze = Maze(cols, rows,null)
+            maze = Maze(cols, rows,null, sleep)
         }
         else -> {
             println("arguments number [${args.size}] invalid")

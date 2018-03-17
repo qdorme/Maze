@@ -3,12 +3,15 @@ package fr.qdorme
 import java.awt.image.BufferedImage
 import java.util.*
 
-class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observable() {
+class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?, private val sleep:Long=35L): Observable() {
+
 
     val cells = mutableListOf<List<Cell>>()
     private val unvisitedCells = mutableListOf<Cell>()
     var generated = false
     val activeCellsNumber : Int
+
+    var currentCell : Cell? = null
 
     init{
         for(col in 0 until colsNumber){
@@ -91,6 +94,7 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
                     //println(" connect remaiing to $neighbor")
                 }
             }
+            this.currentCell = currentCell
             currentCell.visited=true
             unvisitedCells.remove(currentCell)
             val possibleCellsToGo = getPossibleCellsToGo(currentCell)
@@ -109,12 +113,13 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
             //println(" remaining cells $remainingPossibleCells")
             setChanged()
             notifyObservers()
-            Thread.sleep(35L)
+            Thread.sleep(sleep)
         }
     }
 
     fun findEntries(){
         var arbitraryCell = cells.filter { cols -> cols.any { cell -> cell.active } }[0].filter{cell -> cell.active}[0]
+
         propagateDistance(arbitraryCell,1)
         val firstEntry = cells.flatten().filter{it.bordered}.maxBy { it.distance }!!
         firstEntry.entry=true
@@ -133,10 +138,11 @@ class Maze(val colsNumber:Int, val rowsNumber:Int, mask: BufferedImage?): Observ
     }
 
     private fun propagateDistance(cell:Cell, distance:Int){
+        currentCell = cell
         cell.distance = distance
         setChanged()
         notifyObservers()
-        Thread.sleep(35L)
+        Thread.sleep(sleep)
         cell.linkedCells.forEach { cell ->
             if(cell.distance == 0)
                 propagateDistance(cell,distance +1)
