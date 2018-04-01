@@ -1,6 +1,7 @@
-##Maze
+## Maze
 
-###Summary
+### Summary
+
 This program is used to generate a maze and save it under PNG file.
 
 ![sample maze](https://github.com/qdorme/Maze/blob/master/sample_maze.png?raw=true)
