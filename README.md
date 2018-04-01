@@ -1,4 +1,5 @@
 ##Maze
+
 ###Summary
 This program is used to generate a maze and save it under PNG file.
 
